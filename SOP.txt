@@ -1,0 +1,16 @@
+overspørgsmål :
+Hvilke Harware begrænsninger er der ved 3D render?
+
+redegøredne
+	3D render - programmering
+	Matematik - transformations matrix, vector osv.
+	evt. raytrace/andre render metoder
+	
+Analyserende
+	perfomance for 3d render program - flere computere
+	CPU, begrænsinger, GPU til rådighed -> RayTracing?	
+
+Perspektivering
+	Raytracing AI, til 3D render, for mere komplekse/avancerede Scener og textures ->
+	med bedre performance
+	
