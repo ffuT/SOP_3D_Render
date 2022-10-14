@@ -1,5 +1,5 @@
 overspørgsmål :
-Hvilke Harware begrænsninger er der ved 3D render?
+Hvilke Hardware begrænsninger er der ved 3D render?
 
 redegøredne
 	3D render - programmering
