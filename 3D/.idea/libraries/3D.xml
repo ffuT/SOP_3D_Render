@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="3D">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/3D.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
