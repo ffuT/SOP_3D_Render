@@ -177,5 +177,4 @@ public class Display extends Canvas implements Runnable {
         g.dispose();
         bs.show();
     }
-
 }

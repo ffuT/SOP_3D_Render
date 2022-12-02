@@ -1,8 +1,8 @@
 public class Render3D extends Render {
 
     public double[] zBuffer;
-    private final double renderDistance=15000;
-    private final double floorPosition = 20;
+    private final double renderDistance=25000;
+    private final double floorPosition = 16;
     private final double ceilingPosition = 100;
     private double forward, rightward, upward, cosine, sine, walking;
 
@@ -58,11 +58,6 @@ public class Render3D extends Render {
                     pixels[x + y * width] = Texture.MCgrass.pixels[(xPix & 15) + (yPix & 15) * 16];
                 } else{
                     pixels[x + y * width] = Texture.sky.pixels[(xPix & 15) + (yPix & 15) * 16];
-                }   
-
-                //remove background instead of fade away
-                if(z>2500){
-                    pixels[x+y*width]=0;
                 }
             }
         }
@@ -164,6 +159,7 @@ public class Render3D extends Render {
         }
     }
 
+
     //fade away using light aka render distance
     public void RenderDistanceLimit(){
         for(int i=0;i<width*height;i++){
@@ -174,8 +170,8 @@ public class Render3D extends Render {
             if(brightness < 0)
                 brightness = 0;
 
-            if(brightness>200)
-                brightness=200;
+            if(brightness>255)
+                brightness=255;
 
             int r=(color>>16)&0xff;
             int g=(color>>8)&0xff;
