@@ -4,9 +4,6 @@ import java.awt.event.KeyEvent;
 public class Game {
     public int time;
     public Controller control;
-
-    private long currentime;
-
     public Game(){
         control = new Controller();
     } 

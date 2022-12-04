@@ -5,20 +5,13 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.BufferStrategy;
 import java.awt.Graphics;
 import java.awt.Dimension;
-import java.awt.Cursor;
-import java.awt.Toolkit;
-import java.awt.Point;
 import java.awt.*;
-
 
 public class Display extends Canvas implements Runnable {
     public static final int WIDTH = 1080, HEIGHT = 720;
     public static final String TITLE = "3D World";
-    public static double distance=0;
-    public static boolean robotmove=false;
-
+    public static double distance = 0;
     private static Robot r;
-    private double sensetivity = 1000.0;
     private int FPS=0;
     private Thread thread;
     private boolean running = false;
@@ -27,10 +20,6 @@ public class Display extends Canvas implements Runnable {
     private BufferedImage img;
     private int[] pixels;
     private InputHandler input;
-    private int newX=0;
-    private int oldX=0;
-    private int newY=0;
-
 
     public static void main(String[] args) {
         try {
@@ -39,16 +28,12 @@ public class Display extends Canvas implements Runnable {
             System.out.println("robot blyat");
             System.exit(1);
         }
-        BufferedImage cursor = new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB); 
-        Cursor blank = Toolkit.getDefaultToolkit().createCustomCursor(cursor,new Point(0,0),"blank");
         Display game = new Display();
         JFrame frame = new JFrame();
         frame.add(game);
         frame.pack();
-        //frame.getContentPane().setCursor(blank);
         frame.setTitle(TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setSize(WIDTH,HEIGHT);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
@@ -61,6 +46,9 @@ public class Display extends Canvas implements Runnable {
         setPreferredSize(size);
         setMaximumSize(size);
         setMinimumSize(size);
+
+        //run movement!!
+        //robot shit
 
         screen = new Screen(WIDTH,HEIGHT);
         game = new Game();
@@ -99,40 +87,10 @@ public class Display extends Canvas implements Runnable {
                 tick();
                 delta--;
             }
-            if(running)
+            if(running) {
                 render();
-            frames++;
-            /*
-            newX=InputHandler.mouseX;
-            if(newX>oldX && !robotmove){
-                distance = (newX-oldX)/sensetivity;
-                //System.out.println(distance);
-                Controller.rotRight=true;
-            } else {
-                Controller.rotRight=false;
+                frames++;
             }
-            if(newX<oldX && !robotmove){
-                distance = Math.abs(newX-oldX)/sensetivity;
-                //System.out.println(distance);
-                Controller.rotLeft=true;
-            }else {
-                Controller.rotLeft=false;
-            }
-
-            if(newX>1000 || newX<80){
-                robotmove=true;
-                oldX=540;
-                r.mouseMove((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2,(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2);
-                oldX=540;
-                robotmove=false;
-                newX=oldX;
-            }
-
-            
-            oldX=newX;
-            */
-            //newY=InputHandler.mouseY;
-
             if(System.currentTimeMillis() - timer > 1000){
                 timer += 1000;
                 System.out.println("FPS: " + frames);
@@ -165,15 +123,16 @@ public class Display extends Canvas implements Runnable {
 
         screen.render(game);
 
-        for(int i=0;i<WIDTH*HEIGHT;i++){
-            pixels[i] = screen.pixels[i];
-        }
+        System.arraycopy(screen.pixels, 0, pixels, 0, WIDTH * HEIGHT);
 
         Graphics g = bs.getDrawGraphics();
 
         g.drawImage(img, 0, 0, WIDTH,HEIGHT,null);
         g.drawString("FPS: " + FPS, 5, 15);
         g.drawString("WalkSpeed: "+Controller.walkspeed , 5, 30);
+        //print xyz pos on screen (not same xyz as when making boxes)
+        String xyzposition = String.format("%.2f, %.2f, %.2f", game.control.x,game.control.y,game.control.z);
+        g.drawString("x , y , z: "+xyzposition, 5, 45);
         g.dispose();
         bs.show();
     }

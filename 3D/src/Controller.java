@@ -1,8 +1,6 @@
 
 public class Controller {
     public double x , y, z , rotation , xa , za , rotationa;
-    public static boolean rotLeft = false;
-    public static boolean rotRight = false;
     public static boolean walk = false;
     public static boolean isSprinting=false;
     public static double rotationspeed = 0.01;
@@ -43,16 +41,8 @@ public class Controller {
             rotationspeed=0.01;
             rotationa += rotationspeed;
         }
-        if(rotLeft){
-            rotationa -= rotationspeed;
-            rotRight=false;
-        }
-        if(rotRight){
-            rotationa += rotationspeed;
-            rotLeft=false;
-        }
         if(jump){
-            y += jumpheight;
+            //y += jumpheight;
         }
         if(crouch){
             y -=  crouchheight;
