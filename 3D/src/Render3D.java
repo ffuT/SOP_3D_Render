@@ -93,7 +93,7 @@ public class Render3D extends Render {
 
         double tex20 = 0;
         double tex30 = 16;
-        double clip = 0.005;
+        double clip = 0.05;
 
         //clip if you walk into the wall it stops render, (removes visual bugs)
         if(rotLeftSideZ < clip && rotRightSideZ < clip){
@@ -167,7 +167,7 @@ public class Render3D extends Render {
             for(int y = yPixelTopInt;y<yPixelBotInt;y++){
                     double pixelrotationY = (y - yPixelTop) / (yPixelBot - yPixelTop);
                     int yTexture = (int) (16*pixelrotationY);
-                    pixels[x+y*width] = Texture.test.pixels[(xTexture & 15)+(yTexture & 15)*16];
+                    pixels[x+y*width] = Texture.bricks.pixels[(xTexture & 15)+(yTexture & 15)*16];
                     //pixels[x+y*width] =xTexture*80 + yTexture*80;
                     zBuffer[x+y*width]= 1/(tex0+(tex1-tex0)*pixelrotation)*16;
             }

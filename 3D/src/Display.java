@@ -6,12 +6,12 @@ import java.awt.image.BufferStrategy;
 import java.awt.Graphics;
 import java.awt.Dimension;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Display extends Canvas implements Runnable {
     public static final int WIDTH = 1080, HEIGHT = 720;
     public static final String TITLE = "3D World";
     public static double distance = 0;
-    private static Robot r;
     private int FPS=0;
     private Thread thread;
     private boolean running = false;
@@ -20,14 +20,10 @@ public class Display extends Canvas implements Runnable {
     private BufferedImage img;
     private int[] pixels;
     private InputHandler input;
+    private int TotalFPS,CountFPS;
+    private ArrayList<Integer> FPSArr;
 
     public static void main(String[] args) {
-        try {
-            r = new Robot();
-        } catch (Exception e) {
-            System.out.println("robot blyat");
-            System.exit(1);
-        }
         Display game = new Display();
         JFrame frame = new JFrame();
         frame.add(game);
@@ -37,18 +33,15 @@ public class Display extends Canvas implements Runnable {
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
-        
         game.start();
     }
 
     public Display(){
+        FPSArr = new ArrayList<>();
         Dimension size = new Dimension(WIDTH,HEIGHT);
         setPreferredSize(size);
         setMaximumSize(size);
         setMinimumSize(size);
-
-        //run movement!!
-        //robot shit
 
         screen = new Screen(WIDTH,HEIGHT);
         game = new Game();
@@ -93,8 +86,9 @@ public class Display extends Canvas implements Runnable {
             }
             if(System.currentTimeMillis() - timer > 1000){
                 timer += 1000;
-                System.out.println("FPS: " + frames);
-                FPS=frames;
+                System.out.println("FPS: " + frames);               //prints frames
+                FPS=frames;                                         //shows frames top left in stats
+                FPSArr.add(frames);
                 frames = 0;
             }
         }
@@ -112,6 +106,7 @@ public class Display extends Canvas implements Runnable {
 
     private void tick(){
         game.tick(input.key);
+        game.benchmark(FPSArr);       //runs benchmark
     }
 
     private void render(){
@@ -127,12 +122,19 @@ public class Display extends Canvas implements Runnable {
 
         Graphics g = bs.getDrawGraphics();
 
+        //draws calculated image
         g.drawImage(img, 0, 0, WIDTH,HEIGHT,null);
+
+        //draws fps counter
         g.drawString("FPS: " + FPS, 5, 15);
+
+        //draws walking speed
         g.drawString("WalkSpeed: "+Controller.walkspeed , 5, 30);
-        //print xyz pos on screen (not same xyz as when making boxes)
-        String xyzposition = String.format("%.2f, %.2f, %.2f", game.control.x,game.control.y,game.control.z);
+
+        //draws xyz pos on screen (same as boxes (16 cuz box = 16 units (texture is 16x16)))
+        String xyzposition = String.format("%.2f, %.2f, %.2f", game.control.x/16,game.control.y/16,game.control.z/16);
         g.drawString("x , y , z: "+xyzposition, 5, 45);
+
         g.dispose();
         bs.show();
     }
