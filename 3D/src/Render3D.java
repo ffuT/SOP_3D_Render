@@ -1,17 +1,25 @@
+import java.util.Arrays;
+
 public class Render3D extends Render {
 
     public double[] zBuffer;
-    private final double renderDistance=15000;
-    private final double floorPosition = 20;
+    public double[] zBufferWall;
+    private final double renderDistance=20000;
+    private final double floorPosition = 16;
     private final double ceilingPosition = 100;
     private double forward, rightward, upward, cosine, sine, walking;
 
     public Render3D(int width, int height) {
         super(width, height);
         zBuffer = new double[width*height];
+        zBufferWall =  new double[width];
     }
 
     public void floor(Game game){
+        for(int i =0;i <width;i++){
+            zBufferWall[i] = 0;
+        }
+
         forward = game.control.z;
         rightward = game.control.x;
         upward = game.control.y;
@@ -58,11 +66,6 @@ public class Render3D extends Render {
                     pixels[x + y * width] = Texture.MCgrass.pixels[(xPix & 15) + (yPix & 15) * 16];
                 } else{
                     pixels[x + y * width] = Texture.sky.pixels[(xPix & 15) + (yPix & 15) * 16];
-                }   
-
-                //remove background instead of fade away
-                if(z>2500){
-                    pixels[x+y*width]=0;
                 }
             }
         }
@@ -70,7 +73,8 @@ public class Render3D extends Render {
 
     public void renderWall(double xLeft, double xRight, double zDistanceLeft, double zDistanceRight, double yHeight){
         double correction = 1/(floorPosition*2);
-        
+
+        //transformation matrix
         double xcLeft =  ((xLeft) - (rightward*correction))*2;
         double zcLeft = ((zDistanceLeft) - forward*correction)*2;
         
@@ -89,8 +93,9 @@ public class Render3D extends Render {
 
         double tex20 = 0;
         double tex30 = 16;
-        double clip = 0.005;
+        double clip = 0.05;
 
+        //clip if you walk into the wall it stops render, (removes visual bugs)
         if(rotLeftSideZ < clip && rotRightSideZ < clip){
             return;
         }
@@ -138,8 +143,13 @@ public class Render3D extends Render {
 
         for(int x=xPixelLeftInt;x<xPixelRightInt;x++){
             double pixelrotation = (x-xPixelLeft)/(xPixelRight-xPixelLeft);
+            double zWall = (tex0+(tex1-tex0)*pixelrotation);
 
-            int xTexture = (int) ((tex2+tex3*pixelrotation)/(tex0+(tex1-tex0)*pixelrotation));
+            if(zBufferWall[x] > zWall)
+                continue;
+            zBufferWall[x] = zWall;
+
+            int xTexture = (int) ((tex2+tex3*pixelrotation)/zWall);
 
             double yPixelTop = yPixelLeftTop + (yPixelRightTop - yPixelLeftTop) * pixelrotation;
             double yPixelBot = yPixelLeftBot + (yPixelRightBot - yPixelLeftBot) * pixelrotation;
@@ -157,12 +167,13 @@ public class Render3D extends Render {
             for(int y = yPixelTopInt;y<yPixelBotInt;y++){
                     double pixelrotationY = (y - yPixelTop) / (yPixelBot - yPixelTop);
                     int yTexture = (int) (16*pixelrotationY);
-                    pixels[x+y*width] = Texture.test.pixels[(xTexture & 15)+(yTexture & 15)*16];
+                    pixels[x+y*width] = Texture.bricks.pixels[(xTexture & 15)+(yTexture & 15)*16];
                     //pixels[x+y*width] =xTexture*80 + yTexture*80;
                     zBuffer[x+y*width]= 1/(tex0+(tex1-tex0)*pixelrotation)*16;
             }
         }
     }
+
 
     //fade away using light aka render distance
     public void RenderDistanceLimit(){
@@ -174,8 +185,8 @@ public class Render3D extends Render {
             if(brightness < 0)
                 brightness = 0;
 
-            if(brightness>200)
-                brightness=200;
+            if(brightness>255)
+                brightness=255;
 
             int r=(color>>16)&0xff;
             int g=(color>>8)&0xff;

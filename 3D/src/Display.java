@@ -5,20 +5,13 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.BufferStrategy;
 import java.awt.Graphics;
 import java.awt.Dimension;
-import java.awt.Cursor;
-import java.awt.Toolkit;
-import java.awt.Point;
 import java.awt.*;
-
+import java.util.ArrayList;
 
 public class Display extends Canvas implements Runnable {
     public static final int WIDTH = 1080, HEIGHT = 720;
     public static final String TITLE = "3D World";
-    public static double distance=0;
-    public static boolean robotmove=false;
-
-    private static Robot r;
-    private double sensetivity = 1000.0;
+    public static double distance = 0;
     private int FPS=0;
     private Thread thread;
     private boolean running = false;
@@ -27,36 +20,24 @@ public class Display extends Canvas implements Runnable {
     private BufferedImage img;
     private int[] pixels;
     private InputHandler input;
-    private int newX=0;
-    private int oldX=0;
-    private int newY=0;
-
+    private int TotalFPS,CountFPS;
+    private ArrayList<Integer> FPSArr;
 
     public static void main(String[] args) {
-        try {
-            r = new Robot();
-        } catch (Exception e) {
-            System.out.println("robot blyat");
-            System.exit(1);
-        }
-        BufferedImage cursor = new BufferedImage(16,16,BufferedImage.TYPE_INT_ARGB); 
-        Cursor blank = Toolkit.getDefaultToolkit().createCustomCursor(cursor,new Point(0,0),"blank");
         Display game = new Display();
         JFrame frame = new JFrame();
         frame.add(game);
         frame.pack();
-        //frame.getContentPane().setCursor(blank);
         frame.setTitle(TITLE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setSize(WIDTH,HEIGHT);
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
-        
         game.start();
     }
 
     public Display(){
+        FPSArr = new ArrayList<>();
         Dimension size = new Dimension(WIDTH,HEIGHT);
         setPreferredSize(size);
         setMaximumSize(size);
@@ -99,44 +80,15 @@ public class Display extends Canvas implements Runnable {
                 tick();
                 delta--;
             }
-            if(running)
+            if(running) {
                 render();
-            frames++;
-            /*
-            newX=InputHandler.mouseX;
-            if(newX>oldX && !robotmove){
-                distance = (newX-oldX)/sensetivity;
-                //System.out.println(distance);
-                Controller.rotRight=true;
-            } else {
-                Controller.rotRight=false;
+                frames++;
             }
-            if(newX<oldX && !robotmove){
-                distance = Math.abs(newX-oldX)/sensetivity;
-                //System.out.println(distance);
-                Controller.rotLeft=true;
-            }else {
-                Controller.rotLeft=false;
-            }
-
-            if(newX>1000 || newX<80){
-                robotmove=true;
-                oldX=540;
-                r.mouseMove((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 2,(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight()/2);
-                oldX=540;
-                robotmove=false;
-                newX=oldX;
-            }
-
-            
-            oldX=newX;
-            */
-            //newY=InputHandler.mouseY;
-
             if(System.currentTimeMillis() - timer > 1000){
                 timer += 1000;
-                System.out.println("FPS: " + frames);
-                FPS=frames;
+                System.out.println("FPS: " + frames);               //prints frames
+                FPS=frames;                                         //shows frames top left in stats
+                FPSArr.add(frames);
                 frames = 0;
             }
         }
@@ -154,6 +106,7 @@ public class Display extends Canvas implements Runnable {
 
     private void tick(){
         game.tick(input.key);
+        game.benchmark(FPSArr);       //runs benchmark
     }
 
     private void render(){
@@ -165,17 +118,24 @@ public class Display extends Canvas implements Runnable {
 
         screen.render(game);
 
-        for(int i=0;i<WIDTH*HEIGHT;i++){
-            pixels[i] = screen.pixels[i];
-        }
+        System.arraycopy(screen.pixels, 0, pixels, 0, WIDTH * HEIGHT);
 
         Graphics g = bs.getDrawGraphics();
 
+        //draws calculated image
         g.drawImage(img, 0, 0, WIDTH,HEIGHT,null);
+
+        //draws fps counter
         g.drawString("FPS: " + FPS, 5, 15);
+
+        //draws walking speed
         g.drawString("WalkSpeed: "+Controller.walkspeed , 5, 30);
+
+        //draws xyz pos on screen (same as boxes (16 cuz box = 16 units (texture is 16x16)))
+        String xyzposition = String.format("%.2f, %.2f, %.2f", game.control.x/16,game.control.y/16,game.control.z/16);
+        g.drawString("x , y , z: "+xyzposition, 5, 45);
+
         g.dispose();
         bs.show();
     }
-
 }

@@ -1,19 +1,16 @@
 
 public class Controller {
     public double x , y, z , rotation , xa , za , rotationa;
-    public static boolean rotLeft = false;
-    public static boolean rotRight = false;
     public static boolean walk = false;
     public static boolean isSprinting=false;
-    public static double rotationspeed = 0.01;
-    public static double walkspeed = 0.75;
+    public static double rotationspeed;
+    public static double walkspeed;
 
     public void tick(boolean forward, Boolean back,Boolean left,Boolean right,Boolean turnleft,Boolean turnright, boolean jump, boolean sprint, boolean crouch){
         rotationspeed = Display.distance;
-        walkspeed = 0.75;
+        walkspeed = 0.75/2;
         if(!walk)
             walkspeed=0;
-        double jumpheight = 1;
         double crouchheight = 0.6;
         double xmove = 0;
         double zmove = 0;
@@ -36,23 +33,12 @@ public class Controller {
             walk = true;
         }
         if(turnleft){
-            rotationspeed=0.01;
+            rotationspeed=0.01/2;
             rotationa -= rotationspeed;
         }
         if(turnright){
-            rotationspeed=0.01;
+            rotationspeed=0.01/2;
             rotationa += rotationspeed;
-        }
-        if(rotLeft){
-            rotationa -= rotationspeed;
-            rotRight=false;
-        }
-        if(rotRight){
-            rotationa += rotationspeed;
-            rotLeft=false;
-        }
-        if(jump){
-            y += jumpheight;
         }
         if(crouch){
             y -=  crouchheight;
