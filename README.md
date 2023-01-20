@@ -1,3 +1,2 @@
 # SOP_3D_Render
-Programmering og Matematik
-Karakter: 10
+SOP i programmering og matematik. Jeg fik 10 for opgaven
